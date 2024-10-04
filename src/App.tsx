@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
+import { View, Heading, Button, Flex, Text, Card, Icon } from '@aws-amplify/ui-react';
+import '@aws-amplify/ui-react/styles.css';
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import '@aws-amplify/ui-react/styles.css'
 
 const client = generateClient<Schema>();
 
@@ -23,18 +24,22 @@ function App() {
   }
 
   return (
-    <main>
-      <h1>Questions</h1>
-      <button onClick={createQuestion}>Create Question</button>
-      <ul>
+    <View padding="2rem">
+      <Heading level={1} marginBottom="1rem">Questions</Heading>
+      <Button onClick={createQuestion} variation="primary" size="large" marginBottom="2rem">Create Question</Button>
+      <Flex direction="column" gap="1rem">
         {questions.map((question) => (
-          <li key={question.id}>
-            <span>{question.content}</span>
-            <button onClick={() => deleteQuestion(question.id)}>Delete</button>
-          </li>
+          <Card key={question.id} padding="1rem" backgroundColor="white" borderRadius="0.5rem" boxShadow="0 2px 4px rgba(0, 0, 0, 0.1)">
+            <Flex alignItems="center" justifyContent="space-between">
+              <Text>{question.content}</Text>
+              <Button onClick={() => deleteQuestion(question.id)} variation="link">
+                <Icon name="delete" />
+              </Button>
+            </Flex>
+          </Card>
         ))}
-      </ul>
-    </main>
+      </Flex>
+    </View>
   );
 }
 
