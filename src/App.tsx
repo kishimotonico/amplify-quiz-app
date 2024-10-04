@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import { Authenticator } from '@aws-amplify/ui-react'
 import '@aws-amplify/ui-react/styles.css'
-import { QuestionCreateForm } from "../ui-components"; // Docにはこっちの書き方だけどWarningでてる
-import OptionCreateForm from "../ui-components/OptionCreateForm";
-import AnswerCreateForm from "../ui-components/AnswerCreateForm";
 
 const client = generateClient<Schema>();
 
@@ -28,9 +24,16 @@ function App() {
 
   return (
     <main>
-      <QuestionCreateForm />
-      <OptionCreateForm />
-      <AnswerCreateForm />
+      <h1>Questions</h1>
+      <button onClick={createQuestion}>Create Question</button>
+      <ul>
+        {questions.map((question) => (
+          <li key={question.id}>
+            <span>{question.content}</span>
+            <button onClick={() => deleteQuestion(question.id)}>Delete</button>
+          </li>
+        ))}
+      </ul>
     </main>
   );
 }
