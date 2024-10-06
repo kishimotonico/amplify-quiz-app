@@ -19,7 +19,7 @@ const schema = a.schema({
       id: a.id().required(),
       label: a.string(),        // "A", "B", "C", ....
       content: a.string(),      // "ほげ山"    
-      questionID: a.id(),
+      questionID: a.id().required(),
       question: a.belongsTo("Question", "questionID"),
       answers: a.hasMany("Answer", "optionID"),
     })
@@ -28,7 +28,7 @@ const schema = a.schema({
     .model({
       id: a.id().required(),
       createdAt: a.datetime(),
-      optionID: a.id(),
+      optionID: a.id().required(),
       option: a.belongsTo("Option", "optionID"),
     })
     .authorization((allow) => [allow.publicApiKey()]),
