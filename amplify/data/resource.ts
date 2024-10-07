@@ -12,13 +12,14 @@ const schema = a.schema({
       id: a.id().required(),
       content: a.string(),      // "日本で2番目に高い山は？"
       options: a.hasMany("Option", "questionID"),
+      progressions: a.hasMany("Progression", "questionID"),
     })
     .authorization((allow) => [allow.publicApiKey()]),
   Option: a
     .model({
       id: a.id().required(),
       label: a.string(),        // "A", "B", "C", ....
-      content: a.string(),      // "ほげ山"    
+      content: a.string(),      // "ほげ山"
       questionID: a.id().required(),
       question: a.belongsTo("Question", "questionID"),
       answers: a.hasMany("Answer", "optionID"),
@@ -39,6 +40,15 @@ const schema = a.schema({
       id: a.id().required(),
       name: a.string(),
       answers: a.hasMany("Answer", "userID"),
+    })
+    .authorization((allow) => [allow.publicApiKey()]),
+  Progression: a
+    .model({
+      id: a.id().required(),
+      state: a.enum(["in_progress", "finished"]),
+      createdAt: a.datetime(),
+      questionID: a.id(),
+      question: a.belongsTo("Question", "questionID"),
     })
     .authorization((allow) => [allow.publicApiKey()]),
 });

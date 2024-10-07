@@ -65,11 +65,13 @@ const QuestionCard = (props: { question: QuestionType }) => {
   const [options, setOptions] = useState<Array<OptionType>>([]);
 
   useEffect(() => {
-    client.models.Option.observeQuery().subscribe({
-      next: (data) => setOptions([...data.items.filter((option) => option.questionID === question.id)]),
+    client.models.Option.observeQuery({
+      filter: { questionID: { eq: question.id } },
+    }).subscribe({
+      next: (data) => setOptions([...data.items]),
     });
   }, []);
-  
+
   const createOption = async () => {
     const label = String.fromCharCode(65 + options.length);
     const option = await client.models.Option.create({
