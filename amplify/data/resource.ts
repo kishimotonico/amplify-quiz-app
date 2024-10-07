@@ -30,6 +30,15 @@ const schema = a.schema({
       createdAt: a.datetime(),
       optionID: a.id().required(),
       option: a.belongsTo("Option", "optionID"),
+      userID: a.id().required(),
+      user: a.belongsTo("User", "userID"),
+    })
+    .authorization((allow) => [allow.publicApiKey()]),
+  User: a
+    .model({
+      id: a.id().required(),
+      name: a.string(),
+      answers: a.hasMany("Answer", "userID"),
     })
     .authorization((allow) => [allow.publicApiKey()]),
 });
