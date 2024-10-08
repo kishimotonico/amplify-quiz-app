@@ -2,6 +2,9 @@ import { View } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
+import { useEffect, useState } from 'react';
+import { getCurrentProgression } from './logic/progression';
+import { Quiz } from './Quiz';
 
 const client = generateClient<Schema>();
 
@@ -22,11 +25,36 @@ export const App = () => {
     throw registerUser();
   }
 
+  const [progressions, setProgressions] = useState<Array<Schema["Progression"]["type"]>>([]);
+
+  useEffect(() => {
+    const sub = client.models.Progression.observeQuery().subscribe({
+      next: (data) => setProgressions([...data.items]),
+    });
+    
+    return () => { sub.unsubscribe(); };
+  }, []);
+
+  const currentProgression = getCurrentProgression(progressions);
+
   return (
     <View>
       <p>
         こんにちは {userId} さん
       </p>
+      {
+        currentProgression === undefined ?
+        (
+          <p>開始前</p>
+        ) :
+        currentProgression.questionID ?
+        (
+          <Quiz progression={currentProgression} />
+        ) :
+        (
+          <p>エラー</p>
+        )
+      }
     </View>
   );
 };
