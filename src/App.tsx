@@ -5,6 +5,7 @@ import { generateClient } from "aws-amplify/data";
 import { useEffect, useState } from 'react';
 import { getCurrentProgression } from './logic/progression';
 import { QuizContainer } from './QuizContainer';
+import './App.css';
 
 const client = generateClient<Schema>();
 
@@ -106,28 +107,6 @@ export const App = () => {
           )}
         </div>
       </View>
-
-      <style>{`
-        .app-container {
-          display: flex;
-          justify-content: center;
-          height: 100vh;
-          min-height: 524px;
-          background-color: #c0d9df;
-        }
-        .content {
-          width: 100%;
-          min-height: 100vh;
-          background-color: #fff;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        @media (min-width: 500px) {
-          .content {
-            width: 100%;
-            max-width: 500px; /* Adjust this value as needed */
-          }
-        }
-      `}</style>
     </>
   );
 };
