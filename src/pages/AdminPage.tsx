@@ -3,6 +3,7 @@ import { View, Heading, Button, Flex, Text, Card } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
+import { getCurrentProgression, isQuestionFinished, isQuestionInProgress, isQuestionNotStarted } from '../logic/progression';
 
 const client = generateClient<Schema>();
 
@@ -29,15 +30,10 @@ const QuestionCard = (props: { question: QuestionType }) => {
     return () => { sub1.unsubscribe(); sub2.unsubscribe(); };
   }, []);
 
-  const currentProgression = progressions.length > 0 ? progressions.sort((a, b) => {
-    const a_time = a.createdAt ?? "";
-    const b_time = b.createdAt ?? "";
-    return a_time < b_time ? -1 : a_time > b_time ? 1 : 0;
-  }).at(-1) : undefined;
-
-  const inProgress = currentProgression?.questionID === question.id && currentProgression?.state === "in_progress";
-  const finished = progressions.filter((p) => p.questionID === question.id && p.state === "finished").length > 0;
-  const notStarted = progressions.filter((p) => p.questionID === question.id).length === 0;
+  const currentProgression = getCurrentProgression(progressions);
+  const inProgress = isQuestionInProgress(progressions, question.id);
+  const finished = isQuestionFinished(progressions, question.id);
+  const notStarted = isQuestionNotStarted(progressions, question.id);
   const canStart = currentProgression === undefined || currentProgression?.state === "finished";
 
   const onStartButtonClick = async () => {
