@@ -1,4 +1,3 @@
-import { Suspense, useState } from 'react';
 import { View } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import type { Schema } from "../amplify/data/resource";
@@ -6,28 +5,28 @@ import { generateClient } from "aws-amplify/data";
 
 const client = generateClient<Schema>();
 
-export const App = () => {
-  const storedUserId = localStorage.getItem("userId");
-  const [userId, setUserId] = useState<string | null>(storedUserId);
+async function registerUser() {
+  const userId = await client.models.User.create({});
+  if (userId.data === null) {
+    console.error("ユーザー登録に失敗しました");
+    return;
+  }
+  localStorage.setItem("userId", userId.data.id);
+  // デバッグのため、わざと遅らせる
+  await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+}
 
-  if (storedUserId === null) {
-    client.models.User.create({}).then((userId) => {
-      // awaitが使えないのでとりあえず
-      if (userId.data === null) {
-        throw new Error("ユーザー登録に失敗しました");
-      }
-      localStorage.setItem("userId", userId.data.id);
-      setUserId(userId.data.id);
-    });
+export const App = () => {
+  const userId = localStorage.getItem("userId");
+  if (userId === null) {
+    throw registerUser();
   }
 
   return (
-    <Suspense fallback={<></>}>
-      <View>
-        <p>
-          こんにちは {userId} さん
-        </p>
-      </View>
-    </Suspense>
+    <View>
+      <p>
+        こんにちは {userId} さん
+      </p>
+    </View>
   );
 };
