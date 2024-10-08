@@ -3,6 +3,7 @@ import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import { useCallback, useEffect, useState } from 'react';
 import { QuizComponent } from './QuizComponent';
+import { sortByLabel } from './logic/option';
 
 const client = generateClient<Schema>();
 
@@ -37,7 +38,7 @@ export const QuizContainer = (props: {
     const sub = client.models.Option.observeQuery({
       filter: { questionID: { eq: progression.questionID } }
     }).subscribe({
-      next: (data) => setOptions([...data.items]),
+      next: (data) => setOptions(sortByLabel([...data.items])),
     });
 
     return () => sub.unsubscribe();
