@@ -10,9 +10,14 @@ const client = generateClient<Schema>();
 type Question = Schema["Question"]["type"];
 type Option = Schema["Option"]["type"];
 type Progression = Schema["Progression"]["type"];
+type Answer = Schema["Answer"]["type"];
 
-const QuestionCard = (props: { question: Question, progressions: Progression[] }) => {
-  const { question, progressions } = props;
+const QuestionCard = (props: {
+  question: Question,
+  progressions: Progression[],
+  answers: Answer[],
+}) => {
+  const { question, progressions, answers } = props;
   const [options, setOptions] = useState<Array<Option>>([]);
 
   useEffect(() => {
@@ -51,28 +56,55 @@ const QuestionCard = (props: { question: Question, progressions: Progression[] }
     }
   };
 
+  const onClearAnswersButtonClick = async () => {
+    answers.filter((a) => options.map((o) => o.id).includes(a.optionID)).forEach(async (ans) => {
+      await client.models.Answer.delete({ id: ans.id });
+    });
+  };
+
   return (
     <Card>
       <Flex gap="0.5rem" justifyContent="space-between">
-        <Flex gap="0.5rem" direction="column">
-          <Text>{question.content}</Text>
+        <Flex gap="0.5rem" direction="column" width="100%" paddingRight="20px">
+          <Flex justifyContent="space-between">
+            <Text style={{ lineHeight: 2.4 }}>
+              Q. {question.content}
+            </Text>
+            <Button onClick={onClearAnswersButtonClick} size="small">
+              全回答削除
+            </Button>
+          </Flex>
           <Flex direction="column" gap="0.5rem" marginLeft="1rem">
             {options.map((option) => (
-              <div key={option.id}>{option.label}. {option.content ?? ""} </div>
+              <Flex justifyContent="space-between">
+                <div key={option.id}>
+                  {option.label}. {option.content ?? ""}
+                </div>
+                <div>
+                  {answers.filter((a) => a.optionID === option.id).length}人
+                </div>
+              </Flex>
             ))}
           </Flex>
-          <Flex>
-            状態: {finished ? "終了" : inProgress ? "進行中" : "未開始"}
-          </Flex>
         </Flex>
-        <div>
+        <Flex direction="column" width="200px" justifyContent="flex-end">
+          <Text>
+            状態: {finished ? "終了" : inProgress ? "進行中" : "未開始"}
+          </Text>
           {
-            canStart && notStarted && <Button onClick={onStartButtonClick}>開始する</Button>
+            canStart && notStarted ?
+            (
+              <Button onClick={onStartButtonClick}>開始する</Button>
+            ) :
+            inProgress ? 
+            (
+              <Button onClick={onFinishButtonClick} variation="primary">終了する</Button>
+            ) : 
+            (
+              <Button disabled>{finished ? "終了" : "ー" }</Button>
+            )
           }
-          {
-            inProgress && <Button onClick={onFinishButtonClick} variation="primary">終了する</Button>
-          }
-        </div>
+        </Flex>
       </Flex>
     </Card>
   );
@@ -82,6 +114,8 @@ const QuestionCard = (props: { question: Question, progressions: Progression[] }
 export const AdminPage = () => {
   const [questions, setQuestions] = useState<Array<Question>>([]);
   const [progressions, setProgressions] = useState<Array<Progression>>([]);
+  const [users, setUsers] = useState<Array<Schema["User"]["type"]>>([]);
+  const [answers, setAnswers] = useState<Array<Schema["Answer"]["type"]>>([]);
 
   useEffect(() => {
     const sub = client.models.Question.observeQuery().subscribe({
@@ -99,10 +133,42 @@ export const AdminPage = () => {
     return () => sub.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    const sub = client.models.User.observeQuery().subscribe({
+      next: (data) => setUsers([...data.items]),
+    });
+
+    return () => sub.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const sub = client.models.Answer.observeQuery().subscribe({
+      next: (data) => setAnswers([...data.items]),
+    });
+
+    return () => sub.unsubscribe();
+  }, []);
+
   const progressionReset = async () => {
     const progressions = await client.models.Progression.list();
     progressions.data.forEach(async (progression) => {
       await client.models.Progression.delete({ id: progression.id });
+    });
+  };
+
+  const userReset = async () => {
+    const users = await client.models.User.list();
+    users.data.forEach(async (user) => {
+      await client.models.User.delete({ id: user.id });
+    });
+  };
+
+  const answerReset = (userID: string) => async () => {
+    const answers = await client.models.Answer.list();
+    answers.data.forEach(async (answer) => {
+      if (answer.userID === userID) {
+        await client.models.Answer.delete({ id: answer.id });
+      }
     });
   };
 
@@ -115,7 +181,30 @@ export const AdminPage = () => {
         </Flex>
         <Flex direction="column" gap="0.5rem">
           {questions.map((question) => (
-            <QuestionCard key={question.id} question={question} progressions={progressions} />
+            <QuestionCard
+              key={question.id}
+              question={question}
+              progressions={progressions}
+              answers={answers}
+            />
+          ))}
+        </Flex>
+      </div>
+      <div>
+        <Flex marginBottom="0.8rem">
+          <Heading level={4}>ユーザー</Heading>
+          <Button onClick={userReset} size="small">リセット</Button>
+        </Flex>
+        <Flex direction="column" gap="0.5rem">
+          {users.map((user) => (
+            <Flex>
+              <span style={{ lineHeight: 2.4 }}>
+                {user.id}
+              </span>
+              <Button onClick={answerReset(user.id)} size="small">
+                回答削除（{answers.filter((a) => a.userID === user.id).length}件）
+              </Button>
+            </Flex>
           ))}
         </Flex>
       </div>
