@@ -86,22 +86,48 @@ export const App = () => {
   }, []);
 
   const currentProgression = getCurrentProgression(progressions);
-
   return (
-    <View padding="1rem">
-      {
-        currentProgression === undefined ?
-        (
-          <WaitingAnimation />
-        ) :
-        currentProgression.questionID ?
-        (
-          <Quiz userID={userID} progression={currentProgression} key={currentProgression.questionID} />
-        ) :
-        (
-          <p>エラー</p>
-        )
-      }
-    </View>
+    <>
+      <View className="app-container">
+        <div className="content">
+          {currentProgression === undefined ?
+          (
+            <WaitingAnimation />
+          ) : currentProgression.questionID ?
+          (
+            <Quiz
+              key={currentProgression.questionID}
+              userID={userID}
+              progression={currentProgression}
+            />
+          ) :
+          (
+            <p>エラー</p>
+          )}
+        </div>
+      </View>
+
+      <style>{`
+        .app-container {
+          display: flex;
+          justify-content: center;
+          height: 100vh;
+          background-color: #f0f0f0;
+        }
+        .content {
+          width: 100%;
+          min-height: 100vh;
+          padding: 0 20px;
+          background-color: #fff;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        @media (min-width: 500px) {
+          .content {
+            width: 100%;
+            max-width: 500px; /* Adjust this value as needed */
+          }
+        }
+      `}</style>
+    </>
   );
 };
