@@ -1,0 +1,69 @@
+.quiz-root {
+  height: 100%;
+  background-color: #f9f9f9;
+  padding: 0 20px;
+}
+
+.options-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  height: 100%;
+}
+
+.quiz-button {
+  width: 100%;
+  height: 180px;
+  font-size: 1rem;
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 2px solid #aaa;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  position: relative;
+}
+
+.quiz-button:hover {
+  background-color: #ccc;
+}
+
+.quiz-button.selected {
+  background-color: #4c56af; /* 選択されたボタンの背景色を変更 */
+  color: white; /* 選択されたボタンの文字色を変更 */
+}
+
+.quiz-button .checkmark {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 30px;
+  font-size: 40px;
+}
+
+.button-content {
+  display: flex;
+  flex-direction: row;
+  gap: 25px;
+  width: 100%;
+  padding: 0 12px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.button-content .label-text {
+  font-size: 3em;
+  font-weight: bold;
+}
+
+.button-content .content-text {
+  font-size: 1.2em;
+  padding-top: 0.2em;
+  flex-grow: 1;
+}

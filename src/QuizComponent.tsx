@@ -1,6 +1,6 @@
 import '@aws-amplify/ui-react/styles.css';
 import type { Schema } from "../amplify/data/resource";
-import { Button } from '@aws-amplify/ui-react';
+import './Quiz.css';
 
 export const QuizComponent = (props: {
   progression: Schema["Progression"]["type"],
@@ -12,17 +12,26 @@ export const QuizComponent = (props: {
   const { progression, question, options, answer, selectButtonHandler } = props;
 
   return (
-    <div>
-      <p>
-        Q. {question?.content}
-      </p>
-      {
-        options.map((option) => (
-          <Button key={option.id} onClick={selectButtonHandler(option.id)}>
-            {option.label}. {option.content}
-          </Button>
-        ))
-      }
+    <div className="quiz-root">
+      <div className="options-container">
+        {
+          options.map((option) => (
+            <div
+              key={option.id}
+              onClick={selectButtonHandler(option.id)}
+              className={`quiz-button ${answer?.optionID === option.id ? 'selected' : ''}`}
+            >
+              <div className="checkmark">
+                {answer?.optionID === option.id ? '✔' : ''}
+              </div>
+              <div className="button-content">
+                <span className="label-text">{option.label}</span>
+                <span className="content-text">{option.content}</span>
+              </div>
+            </div>
+          ))
+        }
+      </div>
     </div>
   );
 };

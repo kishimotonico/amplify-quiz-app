@@ -112,12 +112,12 @@ export const App = () => {
           display: flex;
           justify-content: center;
           height: 100vh;
-          background-color: #f0f0f0;
+          min-height: 524px;
+          background-color: #c0d9df;
         }
         .content {
           width: 100%;
           min-height: 100vh;
-          padding: 0 20px;
           background-color: #fff;
           box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
