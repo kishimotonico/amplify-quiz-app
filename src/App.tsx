@@ -4,7 +4,7 @@ import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import { useEffect, useState } from 'react';
 import { getCurrentProgression } from './logic/progression';
-import { Quiz } from './Quiz';
+import { QuizContainer } from './QuizContainer';
 
 const client = generateClient<Schema>();
 
@@ -95,7 +95,7 @@ export const App = () => {
             <WaitingAnimation />
           ) : currentProgression.questionID ?
           (
-            <Quiz
+            <QuizContainer
               key={currentProgression.questionID}
               userID={userID}
               progression={currentProgression}

@@ -2,13 +2,11 @@ import '@aws-amplify/ui-react/styles.css';
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import { useCallback, useEffect, useState } from 'react';
-import { Button } from '@aws-amplify/ui-react';
+import { QuizComponent } from './QuizComponent';
 
 const client = generateClient<Schema>();
 
-
-
-export const Quiz = (props: {
+export const QuizContainer = (props: {
   userID: string,
   progression: Schema["Progression"]["type"],
 }) => {
@@ -64,7 +62,7 @@ export const Quiz = (props: {
     return () => sub.unsubscribe();
   }, [options]);
 
-  const onClick = useCallback((optionID: string) => async () => {
+  const selectButtonHandler = useCallback((optionID: string) => async () => {
     if (answer) {
       await client.models.Answer.update({
         id: answer.id,
@@ -79,21 +77,19 @@ export const Quiz = (props: {
   }, [answer]);
 
   return (
-    <div>
+    question && options.length > 0 ?
+    (
+      <QuizComponent
+        progression={progression}
+        question={question}
+        options={options}
+        answer={answer}
+        selectButtonHandler={selectButtonHandler}
+      />
+    ) : (
       <p>
-        Q. {question?.content}
+        ふぇぇ…
       </p>
-      <ul>
-        {options.map((option) => (
-          <li key={option.id}>({option.id}) {option.label}. {option.content} {
-            answer?.optionID === option.id ? (
-              <span>✅</span>
-            ) : (
-              <Button onClick={onClick(option.id)} size="small">選択</Button>
-            )
-          }</li>
-        ))}
-      </ul>
-    </div>
+    )
   );
 };
