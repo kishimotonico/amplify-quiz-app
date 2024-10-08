@@ -7,27 +7,22 @@ import { getCurrentProgression, isQuestionFinished, isQuestionInProgress, isQues
 
 const client = generateClient<Schema>();
 
-type QuestionType = Schema["Question"]["type"];
-type OptionType = Schema["Option"]["type"];
-type ProgressionType = Schema["Progression"]["type"];
+type Question = Schema["Question"]["type"];
+type Option = Schema["Option"]["type"];
+type Progression = Schema["Progression"]["type"];
 
-const QuestionCard = (props: { question: QuestionType }) => {
-  const { question } = props;
-  const [options, setOptions] = useState<Array<OptionType>>([]);
-  const [progressions, setProgressions] = useState<Array<ProgressionType>>([]);
+const QuestionCard = (props: { question: Question, progressions: Progression[] }) => {
+  const { question, progressions } = props;
+  const [options, setOptions] = useState<Array<Option>>([]);
 
   useEffect(() => {
-    const sub1 = client.models.Option.observeQuery({
+    const sub = client.models.Option.observeQuery({
       filter: { questionID: { eq: question.id } }
     }).subscribe({
       next: (data) => setOptions([...data.items]),
     });
 
-    const sub2 = client.models.Progression.observeQuery().subscribe({
-      next: (data) => setProgressions([...data.items]),
-    });
-
-    return () => { sub1.unsubscribe(); sub2.unsubscribe(); };
+    return () => sub.unsubscribe();
   }, []);
 
   const currentProgression = getCurrentProgression(progressions);
@@ -85,11 +80,20 @@ const QuestionCard = (props: { question: QuestionType }) => {
 
 
 export const AdminPage = () => {
-  const [questions, setQuestions] = useState<Array<QuestionType>>([]);
+  const [questions, setQuestions] = useState<Array<Question>>([]);
+  const [progressions, setProgressions] = useState<Array<Progression>>([]);
 
   useEffect(() => {
     const sub = client.models.Question.observeQuery().subscribe({
       next: (data) => setQuestions([...data.items]),
+    });
+
+    return () => sub.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const sub = client.models.Progression.observeQuery().subscribe({
+      next: (data) => setProgressions([...data.items]),
     });
 
     return () => sub.unsubscribe();
@@ -100,7 +104,7 @@ export const AdminPage = () => {
     progressions.data.forEach(async (progression) => {
       await client.models.Progression.delete({ id: progression.id });
     });
-  }
+  };
 
   return (
     <View padding="2rem">
@@ -111,7 +115,7 @@ export const AdminPage = () => {
         </Flex>
         <Flex direction="column" gap="0.5rem">
           {questions.map((question) => (
-            <QuestionCard question={question} key={question.id} />
+            <QuestionCard key={question.id} question={question} progressions={progressions} />
           ))}
         </Flex>
       </div>
