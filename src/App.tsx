@@ -20,8 +20,8 @@ async function registerUser() {
 }
 
 export const App = () => {
-  const userId = localStorage.getItem("userId");
-  if (userId === null) {
+  const userID = localStorage.getItem("userId");
+  if (userID === null) {
     throw registerUser();
   }
 
@@ -40,7 +40,7 @@ export const App = () => {
   return (
     <View>
       <p>
-        こんにちは {userId} さん
+        こんにちは {userID} さん
       </p>
       {
         currentProgression === undefined ?
@@ -49,7 +49,7 @@ export const App = () => {
         ) :
         currentProgression.questionID ?
         (
-          <Quiz progression={currentProgression} />
+          <Quiz userID={userID} progression={currentProgression} key={currentProgression.questionID} />
         ) :
         (
           <p>エラー</p>
