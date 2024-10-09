@@ -4,7 +4,8 @@ import '@aws-amplify/ui-react/styles.css';
 import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import { getCurrentProgression, isQuestionFinished, isQuestionInProgress, isQuestionNotStarted } from '../logic/progression';
-import { sortByLabel } from '../logic/option';
+import { sortOptionsByLabel } from '../logic/option';
+import { sortQuestionsByLabel } from '../logic/question';
 
 const client = generateClient<Schema>();
 
@@ -25,7 +26,7 @@ const QuestionCard = (props: {
     const sub = client.models.Option.observeQuery({
       filter: { questionID: { eq: question.id } }
     }).subscribe({
-      next: (data) => setOptions(sortByLabel([...data.items])),
+      next: (data) => setOptions(sortOptionsByLabel([...data.items])),
     });
 
     return () => sub.unsubscribe();
@@ -120,7 +121,7 @@ export const AdminPage = () => {
 
   useEffect(() => {
     const sub = client.models.Question.observeQuery().subscribe({
-      next: (data) => setQuestions([...data.items]),
+      next: (data) => setQuestions(sortQuestionsByLabel([...data.items])),
     });
 
     return () => sub.unsubscribe();

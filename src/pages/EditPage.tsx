@@ -3,7 +3,8 @@ import { View, Heading, Button, Flex, Text, Card, Input, ButtonGroup } from '@aw
 import '@aws-amplify/ui-react/styles.css';
 import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import { sortByLabel } from '../logic/option';
+import { sortOptionsByLabel } from '../logic/option';
+import { sortQuestionsByLabel } from '../logic/question';
 
 const client = generateClient<Schema>();
 
@@ -114,7 +115,7 @@ const QuestionCard = (props: { question: QuestionType }) => {
     client.models.Option.observeQuery({
       filter: { questionID: { eq: question.id } },
     }).subscribe({
-      next: (data) => setOptions(sortByLabel([...data.items])),
+      next: (data) => setOptions(sortOptionsByLabel([...data.items])),
     });
   }, []);
 
@@ -158,7 +159,7 @@ export const EditPage = () => {
 
   useEffect(() => {
     client.models.Question.observeQuery().subscribe({
-      next: (data) => setQuestions([...data.items]),
+      next: (data) => setQuestions(sortQuestionsByLabel([...data.items])),
     });
   }, []);
 
