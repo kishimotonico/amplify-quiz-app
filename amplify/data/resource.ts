@@ -48,7 +48,12 @@ const schema = a.schema({
   Progression: a
     .model({
       id: a.id().required(),
-      state: a.enum(["in_progress", "finished"]),
+      state: a.enum([
+        "in_progress",  // 問題が投票中
+        "closeup",      // 回答受付を終了
+        "finished",     // 問題終了（答え合わせ）
+        "last_result",  // 最終結果
+      ]),
       createdAt: a.datetime(),
       questionID: a.id(),
       question: a.belongsTo("Question", "questionID"),

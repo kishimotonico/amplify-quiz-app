@@ -101,6 +101,9 @@ export const App = () => {
               userID={userID}
               progression={currentProgression}
             />
+          ) : currentProgression.state === 'last_result' ?
+          (
+            <p>最終結果ページ</p>
           ) :
           (
             <p>エラー</p>

@@ -3,7 +3,7 @@ import { View, Heading, Button, Flex, Text, Card } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import { getCurrentProgression, isQuestionFinished, isQuestionInProgress, isQuestionNotStarted } from '../logic/progression';
+import { getCurrentProgression, isQuestionCloseup, isQuestionFinished, isQuestionInProgress, isQuestionNotStarted } from '../logic/progression';
 import { sortOptionsByLabel } from '../logic/option';
 import { sortQuestionsByLabel } from '../logic/question';
 
@@ -34,28 +34,30 @@ const QuestionCard = (props: {
 
   const currentProgression = getCurrentProgression(progressions);
   const inProgress = isQuestionInProgress(progressions, question.id);
+  const closeup = isQuestionCloseup(progressions, question.id);
   const finished = isQuestionFinished(progressions, question.id);
   const notStarted = isQuestionNotStarted(progressions, question.id);
   const canStart = currentProgression === undefined || currentProgression?.state === "finished";
 
   const onStartButtonClick = async () => {
-    const progression = await client.models.Progression.create({
+    await client.models.Progression.create({
       state: "in_progress",
       questionID: question.id,
     });
-    if (progression === null) {
-      alert("進行状況の作成に失敗しました。");
-    }
+  };
+  
+  const onCloseupButtonClick = async () => {
+    await client.models.Progression.create({
+      state: "closeup",
+      questionID: question.id,
+    });
   };
 
   const onFinishButtonClick = async () => {
-    const progression = await client.models.Progression.create({
+    await client.models.Progression.create({
       state: "finished",
       questionID: question.id,
     });
-    if (progression === null) {
-      alert("進行状況の作成に失敗しました。");
-    }
   };
 
   const onClearAnswersButtonClick = async () => {
@@ -90,9 +92,6 @@ const QuestionCard = (props: {
           </Flex>
         </Flex>
         <Flex direction="column" width="200px" justifyContent="flex-end">
-          <Text>
-            状態: {finished ? "終了" : inProgress ? "進行中" : "未開始"}
-          </Text>
           {
             canStart && notStarted ?
             (
@@ -100,10 +99,14 @@ const QuestionCard = (props: {
             ) :
             inProgress ? 
             (
-              <Button onClick={onFinishButtonClick} variation="primary">終了する</Button>
+              <Button onClick={onCloseupButtonClick} variation="primary">締め切る</Button>
             ) : 
+            closeup ?
             (
-              <Button disabled>{finished ? "終了" : "ー" }</Button>
+              <Button onClick={onFinishButtonClick} variation="primary">答え合わせ</Button>
+            ) :
+            (
+              <Button disabled>{finished ? "終了済" : "ー" }</Button>
             )
           }
         </Flex>
@@ -158,6 +161,10 @@ export const AdminPage = () => {
     });
   };
 
+  const progressionLastResult = async () => {
+    await client.models.Progression.create({ state: "last_result" });
+  };
+
   const userReset = async () => {
     const users = await client.models.User.list();
     users.data.forEach(async (user) => {
@@ -180,6 +187,7 @@ export const AdminPage = () => {
         <Flex>
           <Heading level={4}>クイズ進行状況</Heading>
           <Button onClick={progressionReset} size="small">リセット</Button>
+          <Button onClick={progressionLastResult} size="small">最終結果</Button>
         </Flex>
         <Flex direction="column" gap="0.5rem">
           {questions.map((question) => (

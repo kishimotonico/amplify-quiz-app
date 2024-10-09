@@ -18,6 +18,11 @@ export function isQuestionInProgress (progressions: Progression[], questionID: s
   return currentProgression?.questionID === questionID && currentProgression?.state === "in_progress";
 }
 
+export function isQuestionCloseup (progressions: Progression[], questionID: string): boolean {
+  const currentProgression = getCurrentProgression(progressions);
+  return currentProgression?.questionID === questionID && currentProgression?.state === "closeup";
+}
+
 export function isQuestionFinished (progressions: Progression[], questionID: string): boolean {
   return progressions.filter((p) => p.questionID === questionID && p.state === "finished").length > 0;
 }
