@@ -13,6 +13,10 @@ export const QuizComponent = (props: {
 
   return (
     <div className="quiz-root">
+      <div className="question-header">
+        <span className="question-label">{question.label}</span>
+        <span className="question-content">{question.content}</span>
+      </div>
       <div className="options-container">
         {
           options.map((option) => (
@@ -26,7 +30,7 @@ export const QuizComponent = (props: {
               </div>
               <div className="button-content">
                 <span className="label-text">{option.label}</span>
-                <span className="content-text">{option.content}</span>
+                <span className="title-text">{option.title}</span>
               </div>
             </div>
           ))
