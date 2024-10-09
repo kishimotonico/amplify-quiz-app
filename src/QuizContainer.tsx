@@ -15,6 +15,7 @@ export const QuizContainer = (props: {
   const [question, setQuestion] = useState<Schema["Question"]["type"]>();
   const [options, setOptions] = useState<Array<Schema["Option"]["type"]>>([]);
   const [answer, setAnswer] = useState<Schema["Answer"]["type"]>();
+  const selectedOption = options.find((option) => option.id === answer?.optionID);
 
   useEffect(() => {
     if (! progression.questionID) {
@@ -84,7 +85,7 @@ export const QuizContainer = (props: {
         progression={progression}
         question={question}
         options={options}
-        answer={answer}
+        selectedOption={selectedOption}
         selectButtonHandler={selectButtonHandler}
       />
     ) : (
