@@ -10,6 +10,7 @@ const schema = a.schema({
   Question: a
     .model({
       id: a.id().required(),
+      label: a.string(),        // "Q1", "Q2", "Q3", ....
       content: a.string(),      // "日本で2番目に高い山は？"
       options: a.hasMany("Option", "questionID"),
       progressions: a.hasMany("Progression", "questionID"),
@@ -19,7 +20,9 @@ const schema = a.schema({
     .model({
       id: a.id().required(),
       label: a.string(),        // "A", "B", "C", ....
+      title: a.string(),        // "ほげ山"
       content: a.string(),      // "ほげ山"
+      correct: a.boolean(),     // false
       questionID: a.id().required(),
       question: a.belongsTo("Question", "questionID"),
       answers: a.hasMany("Answer", "optionID"),

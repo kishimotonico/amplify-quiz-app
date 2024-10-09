@@ -69,7 +69,7 @@ const QuestionCard = (props: {
         <Flex gap="0.5rem" direction="column" width="100%" paddingRight="20px">
           <Flex justifyContent="space-between">
             <Text style={{ lineHeight: 2.4 }}>
-              Q. {question.content}
+              {question.label ?? ""} {question.content}
             </Text>
             <Button onClick={onClearAnswersButtonClick} size="small">
               全回答削除

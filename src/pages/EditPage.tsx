@@ -1,18 +1,26 @@
-import { useEffect, useState } from 'react';
-import { View, Heading, Button, Flex, Text, Card, Input } from '@aws-amplify/ui-react';
+import { useEffect, useRef, useState } from 'react';
+import { View, Heading, Button, Flex, Text, Card, Input, ButtonGroup } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import type { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
+import { sortByLabel } from '../logic/option';
 
 const client = generateClient<Schema>();
 
 type QuestionType = Schema["Question"]["type"];
 type OptionType = Schema["Option"]["type"];
 
-const TextOrInput = (props: { value: string, onChange: (value: string) => void, placeholder?: string, variation?: "quiet" }) => {
-  const { value, onChange, placeholder, variation } = props;
+const TextOrInput = (props: {
+  value: string,
+  onChange: (value: string) => void,
+  placeholder?: string,
+  variation?: "quiet",
+  style?: React.CSSProperties,
+}) => {
+  const { value, onChange, placeholder, variation, style } = props;
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(value);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setText(event.target.value);
@@ -29,6 +37,13 @@ const TextOrInput = (props: { value: string, onChange: (value: string) => void, 
     }
   };
 
+  const startEdit = () => {
+    setEditing(true);
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 10);
+  };
+
   return editing ? (
     <Input
       value={text}
@@ -37,9 +52,16 @@ const TextOrInput = (props: { value: string, onChange: (value: string) => void, 
       onKeyDown={handleKeyDown}
       placeholder={placeholder}
       variation={variation}
-    />
+      ref={inputRef}
+        style={style}
+      />
   ) : (
-    <Text onClick={() => setEditing(true)}>{text}</Text>
+    <Text onClick={startEdit} style={{
+      cursor: "pointer",
+      ...style,
+    }}>
+      {text || "_"}
+    </Text>
   );
 }
 
@@ -48,14 +70,38 @@ const OptionForm = (props: { option: OptionType }) => {
   const deleteOption = async () => {
     client.models.Option.delete({ id: option.id });
   };
+  const toggleCorrect = async () => {
+    client.models.Option.update({ id: option.id, correct: !option.correct });
+  }
 
   return (
     <Flex alignItems="center" justifyContent="space-between">
-      <TextOrInput value={option.label ?? ""} onChange={(label) => client.models.Option.update({ id: option.id, label })} variation='quiet' />
-      <TextOrInput value={option.content ?? ""} onChange={(content) => client.models.Option.update({ id: option.id, content })} variation='quiet' />
-      <Button onClick={deleteOption} style={{ fontSize: "14px" }}>
-        ❌️
-      </Button>
+      <TextOrInput
+        value={option.label ?? ""}
+        onChange={(label) => client.models.Option.update({ id: option.id, label })}
+        placeholder='A'
+        style={{ flexGrow: 0 }}
+      />
+      <TextOrInput
+        value={option.title ?? ""}
+        onChange={(title) => client.models.Option.update({ id: option.id, title })}
+        placeholder='title'
+        style={{ flexGrow: 1 }}
+      />
+      <TextOrInput
+        value={option.content ?? ""}
+        onChange={(content) => client.models.Option.update({ id: option.id, content })}
+        placeholder='content'
+        style={{ flexGrow: 2 }}
+      />
+      <ButtonGroup>
+        <Button onClick={toggleCorrect} style={{ fontSize: "14px" }}>
+          {option.correct ? "⭕️" : "❌️"}
+        </Button>
+        <Button onClick={deleteOption} style={{ fontSize: "14px" }}>
+          🗑️
+        </Button>
+      </ButtonGroup>
     </Flex>
   );
 }
@@ -68,7 +114,7 @@ const QuestionCard = (props: { question: QuestionType }) => {
     client.models.Option.observeQuery({
       filter: { questionID: { eq: question.id } },
     }).subscribe({
-      next: (data) => setOptions([...data.items]),
+      next: (data) => setOptions(sortByLabel([...data.items])),
     });
   }, []);
 
@@ -91,6 +137,7 @@ const QuestionCard = (props: { question: QuestionType }) => {
   return (
     <Card key={question.id} padding="1rem" backgroundColor="white" borderRadius="0.5rem" boxShadow="0 2px 4px rgba(0, 0, 0, 0.1)">
       <Flex alignItems="center" justifyContent="space-between" marginBottom="1rem">
+        <TextOrInput value={question.label ?? ""} onChange={(label) => client.models.Question.update({ id: question.id, label })} variation="quiet" />
         <TextOrInput value={question.content ?? ""} onChange={(content) => client.models.Question.update({ id: question.id, content })} />
         <Button onClick={deleteQuestion}>
           🗑️
@@ -126,7 +173,9 @@ export const EditPage = () => {
 
   return (
     <View padding="2rem">
-      <Heading level={1} marginBottom="1rem">Questions</Heading>
+      <Heading level={1} marginBottom="1rem">
+        申し訳程度の編集画面
+      </Heading>
       <Flex direction="column" gap="1rem">
         {questions.map((question) => (
           <QuestionCard question={question} key={question.id} />
