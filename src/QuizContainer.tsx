@@ -65,6 +65,10 @@ export const QuizContainer = (props: {
   }, [options]);
 
   const selectButtonHandler = useCallback((optionID: string) => async () => {
+    if (progression.state !== "in_progress") {
+      console.error("時間切れのため回答できません");
+      return;
+    }
     if (answer) {
       await client.models.Answer.update({
         id: answer.id,
@@ -76,7 +80,7 @@ export const QuizContainer = (props: {
         userID,
       });
     }
-  }, [answer]);
+  }, [answer, progression.state, userID]);
 
   return (
     question && options.length > 0 ?

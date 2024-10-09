@@ -22,10 +22,11 @@
 
 .quiz-root .result-overlay .state-display {
   font-size: 2.4rem;
-	text-shadow:1px 1px 0 #111,-1px 1px 0 #111,1px -1px 0 #111,-1px -1px 0 #111;
+  text-shadow:0 0 3px #111,0 0 3px #111,0 0 3px #111,0 0 3px #111,0 0 3px #111,0 0 3px #111,0 0 3px #111,0 0 3px #111,0 0 3px #111,0 0 3px #111,0 0 3px #111,0 0 3px #111,0 0 3px #111,0 0 3px #111,0 0 3px #111,0 0 3px #111;
   color: #fff;
   position: absolute;
-  top: 80px;
+  top: 40%;
+  text-align: center;
 }
 
 .quiz-root .result-overlay .result-display {

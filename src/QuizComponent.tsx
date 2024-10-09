@@ -14,13 +14,20 @@ export const QuizComponent = (props: {
   return (
     <div className="quiz-root">
       {
-        progression.state === "finished" ? (
+        progression.state === "closeup" ? (
           <div className="result-overlay">
             <div className="state-display">
+              <div>
+                回答時間終了！
+              </div>
               <div>
                 結果は…
               </div>
             </div>
+          </div>
+        ) : 
+        progression.state === "finished" ? (
+          <div className="result-overlay">
             <div className="result-content">
               {
                 selectedOption?.correct ? (
