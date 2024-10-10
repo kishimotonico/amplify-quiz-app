@@ -7,6 +7,7 @@ import outputs from "../amplify_outputs.json";
 import { AdminPage } from "./pages/AdminPage.tsx";
 import { EditPage } from "./pages/EditPage.tsx";
 import { IndexPage } from "./pages/IndexPage.tsx";
+import { OverlayPage } from "./pages/OverlayPage.tsx";
 
 Amplify.configure(outputs);
 
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
   {
     path: "/edit",
     element: <EditPage />
+  },
+  {
+    path: "/overlay",
+    element: <OverlayPage />
   },
 ]);
 
