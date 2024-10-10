@@ -103,10 +103,14 @@ export const App = () => {
             />
           ) : currentProgression.state === 'last_result' ?
           (
-            <p>最終結果ページ</p>
+            <p>
+              最終結果ページ、作れていません。ご参加ありがとうございました！
+            </p>
           ) :
           (
-            <p>エラー</p>
+            <p>
+              エラー
+            </p>
           )}
         </div>
       </View>

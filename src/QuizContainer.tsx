@@ -94,7 +94,7 @@ export const QuizContainer = (props: {
       />
     ) : (
       <p>
-        ふぇぇ…
+        Loading...
       </p>
     )
   );
