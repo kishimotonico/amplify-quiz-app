@@ -8,8 +8,8 @@ import { sortQuestionsByLabel } from '../logic/question';
 
 const client = generateClient<Schema>();
 
-type QuestionType = Schema["Question"]["type"];
-type OptionType = Schema["Option"]["type"];
+type Question = Schema["Question"]["type"];
+type Option = Schema["Option"]["type"];
 
 const TextOrInput = (props: {
   value: string,
@@ -66,7 +66,7 @@ const TextOrInput = (props: {
   );
 }
 
-const OptionForm = (props: { option: OptionType }) => {
+const OptionForm = (props: { option: Option }) => {
   const { option } = props;
   const deleteOption = async () => {
     client.models.Option.delete({ id: option.id });
@@ -107,16 +107,18 @@ const OptionForm = (props: { option: OptionType }) => {
   );
 }
 
-const QuestionCard = (props: { question: QuestionType }) => {
+const QuestionCard = (props: { question: Question }) => {
   const { question } = props;
-  const [options, setOptions] = useState<Array<OptionType>>([]);
+  const [options, setOptions] = useState<Array<Option>>([]);
 
   useEffect(() => {
-    client.models.Option.observeQuery({
+    const sub = client.models.Option.observeQuery({
       filter: { questionID: { eq: question.id } },
     }).subscribe({
       next: (data) => setOptions(sortOptionsByLabel([...data.items])),
-    });
+    }); // 編集画面なので、Questionの個数だけsubscribeされる実装には目をつむる
+
+    return () => sub.unsubscribe();
   }, []);
 
   const createOption = async () => {
@@ -162,12 +164,14 @@ const QuestionCard = (props: { question: QuestionType }) => {
 };
 
 export const EditPage = () => {
-  const [questions, setQuestions] = useState<Array<QuestionType>>([]);
+  const [questions, setQuestions] = useState<Array<Question>|null>(null);
 
   useEffect(() => {
-    client.models.Question.observeQuery().subscribe({
+    const sub = client.models.Question.observeQuery().subscribe({
       next: (data) => setQuestions(sortQuestionsByLabel([...data.items])),
     });
+
+    return () => sub.unsubscribe();
   }, []);
 
   async function createQuestion() {
@@ -182,11 +186,19 @@ export const EditPage = () => {
       <Heading level={1} marginBottom="1rem">
         申し訳程度の編集画面
       </Heading>
-      <Flex direction="column" gap="1rem">
-        {questions.map((question) => (
-          <QuestionCard question={question} key={question.id} />
-        ))}
-      </Flex>
+      {
+        questions === null ? (
+          <Text>読み込み中...</Text>
+        ) : questions.length === 0 ? (
+          <Text>質問がありません</Text>
+        ) : (
+          <Flex direction="column" gap="1rem">
+            {questions.map((question) => (
+              <QuestionCard question={question} key={question.id} />
+            ))}
+          </Flex>  
+        )
+      }
       <Button onClick={createQuestion} variation="primary" marginTop="1rem">質問を追加</Button>
     </View>
   );
