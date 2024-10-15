@@ -86,14 +86,14 @@ const OptionForm = (props: { option: OptionType }) => {
       <TextOrInput
         value={option.title ?? ""}
         onChange={(title) => client.models.Option.update({ id: option.id, title })}
-        placeholder='title'
+        placeholder='短い選択肢名'
         style={{ flexGrow: 1 }}
       />
       <TextOrInput
         value={option.content ?? ""}
         onChange={(content) => client.models.Option.update({ id: option.id, content })}
-        placeholder='content'
-        style={{ flexGrow: 2 }}
+        placeholder='詳しい内容'
+          style={{ flexGrow: 2 }}
       />
       <ButtonGroup>
         <Button onClick={toggleCorrect} style={{ fontSize: "14px" }}>
@@ -123,7 +123,6 @@ const QuestionCard = (props: { question: QuestionType }) => {
     const label = String.fromCharCode(65 + options.length);
     const option = await client.models.Option.create({
       label,
-      content: "崑崙山",
       questionID: question.id,
     });
     if (option === null) {
@@ -138,8 +137,16 @@ const QuestionCard = (props: { question: QuestionType }) => {
   return (
     <Card key={question.id} padding="1rem" backgroundColor="white" borderRadius="0.5rem" boxShadow="0 2px 4px rgba(0, 0, 0, 0.1)">
       <Flex alignItems="center" justifyContent="space-between" marginBottom="1rem">
-        <TextOrInput value={question.label ?? ""} onChange={(label) => client.models.Question.update({ id: question.id, label })} variation="quiet" />
-        <TextOrInput value={question.content ?? ""} onChange={(content) => client.models.Question.update({ id: question.id, content })} />
+        <TextOrInput
+          value={question.label ?? ""}
+          onChange={(label) => client.models.Question.update({ id: question.id, label })}
+          placeholder="Q1."
+        />
+        <TextOrInput
+          value={question.content ?? ""}
+          onChange={(content) => client.models.Question.update({ id: question.id, content })}
+          placeholder="日本で2番目に高い山は？"
+        />
         <Button onClick={deleteQuestion}>
           🗑️
         </Button>
@@ -164,9 +171,7 @@ export const EditPage = () => {
   }, []);
 
   async function createQuestion() {
-    const question = await client.models.Question.create({
-      content: "日本で2番目に高い山は？",
-    });
+    const question = await client.models.Question.create({});
     if (question === null) {
       console.error("問題の作成に失敗しました。");
     }

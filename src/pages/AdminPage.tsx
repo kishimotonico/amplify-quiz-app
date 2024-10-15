@@ -82,7 +82,7 @@ const QuestionCard = (props: {
             {options.map((option) => (
               <Flex justifyContent="space-between">
                 <div key={option.id}>
-                  {option.label}. {option.content ?? ""}
+                  {option.label}. {option.title ?? option.content ?? ""}
                 </div>
                 <div>
                   {answers.filter((a) => a.optionID === option.id).length}人
