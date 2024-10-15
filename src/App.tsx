@@ -5,6 +5,7 @@ import { generateClient } from "aws-amplify/data";
 import { useEffect, useState } from 'react';
 import { getCurrentProgression } from './logic/progression';
 import { QuizContainer } from './QuizContainer';
+import { ResultContainer } from './ResultContaier';
 import './App.css';
 
 const client = generateClient<Schema>();
@@ -103,9 +104,10 @@ export const App = () => {
             />
           ) : currentProgression.state === 'last_result' ?
           (
-            <p>
-              最終結果ページ、作れていません。ご参加ありがとうございました！
-            </p>
+            <ResultContainer
+              userID={userID}
+              progression={currentProgression}
+            />
           ) :
           (
             <p>
