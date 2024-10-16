@@ -1,25 +1,38 @@
-## AWS Amplify React+Vite Starter Template
+## Amplify Quiz App
 
-This repository provides a starter template for creating applications using React+Vite and AWS Amplify, emphasizing easy setup for authentication, API, and database capabilities.
+AWS Amplify (Gen2)を使ったクイズアプリの実装です。
 
-## Overview
+会社でのミニ勉強会の機会に、Amplifyのキャッチアップを兼ねて30～40時間程度で製作しました。
 
-This template equips you with a foundational React application integrated with AWS Amplify, streamlined for scalability and performance. It is ideal for developers looking to jumpstart their project with pre-configured AWS services like Cognito, AppSync, and DynamoDB.
+![画面のプレビュー](./doc/screenshot.gif)
 
-## Features
+## 機能
 
-- **Authentication**: Setup with Amazon Cognito for secure user authentication.
-- **API**: Ready-to-use GraphQL endpoint with AWS AppSync.
-- **Database**: Real-time database powered by Amazon DynamoDB.
+クイズの参加者は次のことができます。
 
-## Deploying to AWS
+- Amplifyアプリ(`/`)を開いて、クイズに参加します
+    - 管理者がクイズを開始するまでは、待機画面が表示されます
+    - クイズが開始されると、問題文と選択肢が表示され、選択できます
+    - 管理者が正解発表すると、回答の正誤が表示されます
 
-For detailed instructions on deploying your application, refer to the [deployment section](https://docs.amplify.aws/react/start/quickstart/#deploy-a-fullstack-app-to-aws) of our documentation.
+クイズの管理者は次のことができます
 
-## Security
+- 管理画面(`/admin`)にアクセスできます
+    - クイズの進行（回答受付の開始・終了・正解発表）を管理します
+    - 各ユーザー・各問題における回答を削除できます
+- 編集画面(`/edit`)にアクセスできます
+    - クイズの問題と選択肢を編集できます
 
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+## 仕様
 
-## License
+短時間で実装したかったので、必要そうないろんな機能を省いたミニマムなアプリになっています。
 
-This library is licensed under the MIT-0 License. See the LICENSE file.
+- データの取得がサンプルコードのままなので、効率が悪くなっています
+- データの認証・認可を省いているので、参加者がマスターデータを読み書きしたり、他の参加者の回答を消したりできます
+- 裏技があった方が面白いので、GraphQLのレスポンスを覗くと答えが分かる仕様になっています
+- アクセスできた方が面白いので、管理画面に認証を実装していません
+- ルーム機能（複数のクイズ大会の同時開催）などの豪華な仕様もありません
+
+## 開発・デプロイ方法
+
+https://docs.amplify.aws/react/start/quickstart/
